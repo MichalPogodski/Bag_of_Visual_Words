@@ -4,7 +4,7 @@ import pickle
 from pathlib import Path
 from typing import Tuple
 from sklearn.model_selection import train_test_split
-from sklearn import cluster
+from sklearn import svm,  ensemble, cluster
 from sklearn.tree import DecisionTreeClassifier
 import cv2
 import numpy as np
@@ -68,11 +68,13 @@ def project():
     x, y = load_dataset(data_path)
     x = data_processing(x)
 
+
     # TODO: create a detector/descriptor here. Eg. cv2.AKAZE_create()
     feature_detector_descriptor = cv2.AKAZE_create()
 
     # TODO: train a vocabulary model and save it using pickle.dump function
-    train_images, test_images, train_labels, test_labels = train_test_split(x, y, train_size=0.9, random_state=42, stratify=y)
+    train_images, test_images, train_labels, test_labels = train_test_split(x, y, train_size=0.8, random_state=42, stratify=y)
+
 
     train_descriptor = []
     for image in train_images:
@@ -85,7 +87,7 @@ def project():
     x_train = apply_feature_transform(train_images, feature_detector_descriptor, kmeans)
     y_train = train_labels
 
-    classifier = DecisionTreeClassifier()
+    classifier = svm.SVC(kernel='poly', random_state=42)
     classifier.fit(x_train, y_train)
 
     pickle.dump(classifier, open('./clf.p', 'wb'))
@@ -93,14 +95,61 @@ def project():
 
     with Path('vocab_model.p').open('rb') as vocab_file:  # Don't change the path here
         vocab_model = pickle.load(vocab_file)
+    x_transformed = apply_feature_transform(test_images, feature_detector_descriptor, vocab_model)
 
-    x_transformed = apply_feature_transform(x, feature_detector_descriptor, vocab_model)
+####################################################
+    # x_train = apply_feature_transform(train_images, feature_detector_descriptor, vocab_model)
+    # y_train = train_labels
+    #
+    # clf_DT = DecisionTreeClassifier(random_state=42)
+    # clf_DT.fit(x_train, y_train)
+    #
+    # clf_svm = svm.SVC(random_state=42)
+    # clf_svm.fit(x_train, y_train)
+    #
+    # clf_rf = ensemble.RandomForestClassifier(random_state=42)
+    # clf_rf.fit(x_train, y_train)
+
+
+    # print('DT: ', clf_DT.score(x_transformed, test_labels))
+    # print('SVC: ', clf_svm.score(x_transformed, test_labels))
+    # print('rf: ', clf_rf.score(x_transformed, test_labels))
+
+#####################################################
+####################################################
+    # x_train = apply_feature_transform(train_images, feature_detector_descriptor, vocab_model)
+    # y_train = train_labels
+    #
+    # clf_0 = svm.SVC(kernel='poly', random_state=42)
+    # clf_0.fit(x_train, y_train)
+    #
+    # clf_1 = svm.SVC(kernel='linear', random_state=42)
+    # clf_1.fit(x_train, y_train)
+    #
+    # clf_2 = svm.SVC(kernel='rbf', random_state=42)
+    # clf_2.fit(x_train, y_train)
+    #
+    # clf_3 = svm.SVC(kernel='sigmoid', random_state=42)
+    # clf_3.fit(x_train, y_train)
+    #
+    # clf_4 = svm.SVC(kernel='precomputed', random_state=42)
+    # clf_4.fit(x_train, y_train)
+    #
+    # print('clf_0: ', clf_0.score(x_transformed, test_labels))
+    # print('clf_1: ', clf_1.score(x_transformed, test_labels))
+    # print('clf_2: ', clf_2.score(x_transformed, test_labels))
+    # print('clf_3: ', clf_3.score(x_transformed, test_labels))
+    # print('clf_4: ', clf_4.score(x_transformed, test_labels))
+
+#####################################################
+
+
 
     # TODO: train a classifier and save it using pickle.dump function
     with Path('clf.p').open('rb') as classifier_file:  # Don't change the path here
         clf = pickle.load(classifier_file)
 
-    score = clf.score(x_transformed, y)
+    score = clf.score(x_transformed, test_labels) ###############################################
     print(f'{first_name} {last_name} score: {score}')
     with Path(f'{last_name}_{first_name}_score.json').open('w') as score_file:  # Don't change the path here
         json.dump({'score': score}, score_file)
