@@ -3,7 +3,7 @@
 Recognize popular buildings from Poznań with Bag of Visual Words. 
 
 ## Data: 
-Data provided by a lecturer. 
+Provided by a lecturer. 
 Data contains 5 classes, 32 image per class. 
 ### Classes:
 * Bałtyk 
