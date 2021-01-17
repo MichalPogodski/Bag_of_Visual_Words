@@ -1,6 +1,6 @@
 # Bag of Visual Words
 ## Goal: 
-Recognize popular buildings from Poznań with Bag of Visual Words. 
+Recognize popular buildings in Poznań with Bag of Visual Words. 
 
 ## Data: 
 Provided by a lecturer. 
